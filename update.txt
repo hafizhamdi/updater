@@ -1,1 +1,1 @@
-Latestversion:v2.5.1
+Latestversion:v2.5.22
