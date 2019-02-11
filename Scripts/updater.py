@@ -13,7 +13,11 @@ import logging
 OK = 1
 NOK = 0
 
-log_file = path.join(os.getcwd(),'updater.log')
+
+htpdir = path.abspath(path.join(os.getcwd(), '../../..'))
+log_file = path.join(htpdir + '\\log','updater.log')
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -63,13 +67,28 @@ def get_remote_version():
   ver = sres[14:]
   return remove_dot(ver)
 
-def confirm():
+def confirm(local, remote):
   MessageBox = ctypes.windll.user32.MessageBoxW
-  return MessageBox(None, 'Are you sure want to download the latest patches?', 'Confirm', 1)  
+  return MessageBox(None, 'Current v%s. Confirm download the latest patches v%s?' % (local, remote ), 'Confirm', 1)  
   
 def padzero(version):
   return str(version).zfill(5)
-  
+
+def backup():
+  import subprocess as p  
+  sts = NOK
+  try:
+    bindir = path.abspath(path.join(os.getcwd(),'../..'))
+    bkpscr = path.join(bindir, 'backup.bat')
+    p.call([bkpscr,'/b'])
+    logger.info("Backup files... success")
+    sts = OK
+  except:
+    logger.error("Backup files error")
+    sts = NOK
+  finally:
+    return sts
+
 def download(version):
   import requests,zipfile,io
   sts = NOK
@@ -105,16 +124,32 @@ def update_localv(ver):
   try:
     with open('update','w') as f:
       f.write('CurrentVersion:' + append_dot(ver))
-    logger.info("Updating local version success.")
+    logger.info("Updating local version %s success" % (ver))
   except:
     logger.error("Updating local version failed.")
 
+def stop_services():
+  import subprocess as p  
+  sts = NOK
+  try:
+    bindir = path.abspath(path.join(os.getcwd(),'../..'))
+    stopscr = path.join(bindir, 'stop_services.bat')
+    p.call([bkpscr])
+    logger.info("Stop services... success")
+    sts = OK
+  except:
+    logger.error("Stop services error")
+    sts = NOK
+  finally:
+    return sts
 
 remote = get_remote_version()
 local = get_local_version()
 
 if 1 == compare_version(local,remote):
   #print(confirm())
-  if 1 == confirm():
-    if OK == download(remote):
-      update_localv(remote)
+  if 1 == confirm(local,remote):
+    ss = stop_services() # Stop running services HISHTP Service and Print Watcher 
+    if OK == backup(): # Backup data to bkp under C directory
+      if OK == download(remote): # Check downloading
+        update_localv(remote) # Sucess, update local version 

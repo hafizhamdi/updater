@@ -15,3 +15,8 @@ if not exist %path% (
 %cd%\nssm.exe install "Print Watcher" %cd%\dist\watcher\watcher.exe
 
 %cd%\nssm.exe set "Print Watcher" Description "This service to monitor file creation for print"
+
+%cd%\nssm.exe install "HTP Updater" %cd%\dist\updater\updater.exe
+
+%cd%\nssm.exe set "HTP Updater" Description "This service to regularly update HISHTPService to the latest version"
+

@@ -4,6 +4,10 @@
 
 %cd%\nssm.exe remove "Print Watcher" confirm
 
+%cd%\nssm.exe stop "HTP Updater"
+
+%cd%\nssm.exe remove "HTP Updater" confirm
+
 set path=C:\Windows\Microsoft.NET\Framework\v4.0.30319
 echo %path%
 if not exist %path% ( 

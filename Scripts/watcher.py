@@ -4,11 +4,15 @@ import win32file
 import win32con
 import logging
 import subprocess
+import os
 
 path_to_watch = path.abspath(path.join(os.getcwd(), '../../..')) # look at C:/HISHTPService
 file_to_watch = path.join(path_to_watch,'data')
-log_file = path.join(path_to_watch, 'watcher.log')
+log = path_to_watch + '\\log'
+log_file = path.join(log, 'watcher.log')
 
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
+  
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
